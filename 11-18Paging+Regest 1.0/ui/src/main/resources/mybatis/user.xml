@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC " -//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mybatis.user">
+	<insert id="regesterUser" parameterType="_UserInfo">
+		insert into
+		user_info_regester ( user_name,password )
+		values
+		(#{userName},#{password})
+	</insert>
+	<select id="selectAllUserInfo" parameterType="int" resultMap="selectAllUser">
+		select t.code,t.user_name,t.password
+		from ( select u.code,u.user_name,u.password,ROW_NUMBER() OVER (ORDER BY u.code ) as rank
+		       from user_info_regester u ) as t
+		where t.rank between (#{page}-1)*10 and #{page}*10
+	</select>
+	<resultMap id="selectAllUser" type="_UserInfo">
+		<id property="code" column="code"/>
+		<result property="userName" column="user_name"/>
+		<result property="password" column="password"/>	
+	</resultMap>
+	<select id="selectPageCount" resultType="int">
+		select count(u.code)
+		from user_info_regester u
+	</select>
+	
+</mapper>
